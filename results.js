@@ -11,8 +11,8 @@ const options = {
 };
 
 
-rp(options).then(function (html) {
-    console.log(cheerio("div.col-sm-6",html).length);
+rp(options).then(function ($) {
+    console.log($("div.col-sm-6").length);
 }).catch(function (err) {
     //handle error
 });
