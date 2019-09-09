@@ -1,8 +1,21 @@
 //Scrape athletic.net for the results of that week and update a json file that represents an associative array where the key is each team member's name, and the value is how many points they got.
 
-var raceLink="https://www.athletic.net/CrossCountry/meet/145525/results";
+var raceLink = "https://www.athletic.net/CrossCountry/meet/145525/results";
+const rp = require('request-promise');
+const cheerio = require('cheerio');
+const options = {
+  uri: raceLink,
+  transform: function (body) {
+    return cheerio.load(body);
+  }
+};
 
 
+rp(options).then(function (html) {
+    console.log(cheerio("div.col-sm-6",html).length);
+}).catch(function (err) {
+    //handle error
+});
 
 
 //HTML selector for school name from meet results page: 
