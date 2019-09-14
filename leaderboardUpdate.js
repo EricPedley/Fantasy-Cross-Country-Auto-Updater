@@ -6,15 +6,18 @@
 // 2. Install the Node.js client library by running
 //    `npm install googleapis --save`
 
-const { google } = require('googleapis');
+const google = require('googleapis');
 const fs = require('fs');
-const TOKEN_PATH = 'token.json';
-var sheets = google.sheets('v4');
-const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 const readline = require('readline');
 
-var members = ["Sid", "Eric", "Drew", "Trevor", "Logan", "Rishab", "Andrew"];
+const TOKEN_PATH = 'token.json';
+const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 
+var sheets = google.sheets('v4');
+
+const members = ["Sid", "Eric", "Drew", "Trevor", "Logan", "Rishab", "Andrew"];
+
+const sheetID = "11gJYQ9SRDQMBY-W6gNw9hSggOgse5Bbcx-m1SVU6l4I";
 
 fs.readFile('credentials.json', (err, content) => {
     if (err) return console.log('Error loading client secret file:', err);
@@ -25,22 +28,15 @@ fs.readFile('credentials.json', (err, content) => {
 function readResultsAndUpdate(authClient) {
     fs.readFile("results.json", (err, content) => {
         if (err) return console.log('Error loading results file:', err);
-        updatePoints("D", 2, JSON.parse(content), authClient);
+        updateLeaderboard("J", 23, JSON.parse(content), authClient);
     });
 }
 
-
-
-
-
-
-function updatePoints(gridLetter, gridNumber, results, authClient) {//grid Letter and Number are the coordinates of the top slot for points
+function updateLeaderboard(gridLetter, gridNumber, results, authClient) {//grid Letter and Number are the coordinates of the top slot for points
     members.forEach((member) => {
-        let playerRowLetter = String.fromCharCode(gridLetter.charCodeAt(0) - 1)
         var request = {
-            spreadsheetId: '1HWcEocs48wDcUZN7HOT-y1TR78k6t85iiyUmqz0MzJg',
-            range: member + "!" + playerRowLetter + gridNumber + ":" + playerRowLetter + (gridNumber + 4),
-            majorDimension: "COLUMNS",
+            spreadsheetId: sheetID,
+            range: member + "!" + gridLetter + gridNumber,
             auth: authClient
         }
         sheets.spreadsheets.values.get(request, function (err, response) {
@@ -48,27 +44,14 @@ function updatePoints(gridLetter, gridNumber, results, authClient) {//grid Lette
                 console.error(err);
                 return;
             }
-
-            // TODO: Change code below to process the `response` object:
-            // response.data.values.forEach((player)=> {
-            //     console.log(player);
-            // });
             if (response.data.values !== undefined)
-                Array.from(response.data.values)[0].forEach((player, index) => {
-                    console.log(player);
-                    var points = 0;
-                    if (results[player] !== undefined)
-                        points = results[player];
                     var request = {//data to be sent to spreadsheet API
                         // The ID of the spreadsheet to update.
-                        spreadsheetId: '1HWcEocs48wDcUZN7HOT-y1TR78k6t85iiyUmqz0MzJg',
-
+                        spreadsheetId: sheetID,
                         // The A1 notation of the values to update.
                         range: member + '!' + gridLetter + (gridNumber + index),
-
                         // How the input data should be interpreted.
                         valueInputOption: 'RAW',
-
                         resource: {
                             "values": [
                                 [
@@ -80,82 +63,20 @@ function updatePoints(gridLetter, gridNumber, results, authClient) {//grid Lette
                         auth: authClient,
                     };
                     sheets.spreadsheets.values.update(request, function (err, response) {
+                        console.log("done");
                         if (err) {
                             console.error(err);
                             return;
                         }
-
-                        // TODO: Change code below to process the `response` object:
-                        //console.log(JSON.stringify(response, null, 2));
                     });
                 });
         });
-
-
-
     });
 }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// fs.readFile('credentials.json', (err, content) => {
-//     if (err) return console.log('Error loading client secret file:', err);
-//     // Authorize a client with credentials, then call the Google Sheets API.
-//     authorize(JSON.parse(content), changeData);
-// });
-var changeData = function (authClient) {
-
-    var request = {
-        // The ID of the spreadsheet to update.
-        spreadsheetId: '1HWcEocs48wDcUZN7HOT-y1TR78k6t85iiyUmqz0MzJg',  // TODO: Update placeholder value.
-
-        // The A1 notation of the values to update.
-        range: 'Eric!A12',  // TODO: Update placeholder value.
-
-        // How the input data should be interpreted.
-        valueInputOption: 'RAW',  // TODO: Update placeholder value.
-
-        resource: {
-            "values": [
-                [
-                    "Hi there"
-                ]
-            ]
-        },
-
-        auth: authClient,
-    };
-
-    sheets.spreadsheets.values.update(request, function (err, response) {
-        if (err) {
-            console.error(err);
-            return;
-        }
-
-        // TODO: Change code below to process the `response` object:
-        console.log(JSON.stringify(response, null, 2));
-    });
-};
-
-
+//-----------------------HELPER METHODS-----------------------
 /**
  * Get and store new token after prompting for user authorization, and then
  * execute the given callback with the authorized OAuth2 client.
