@@ -13,8 +13,8 @@ var athleteIDtoNames = {
   "12255496": "Ben",
   "15854678": "Brevin",
   "12255512": "Charles",
-  "14519743": "Colin",
-  "14026999": "Collin",
+  "14519743": "Colin S",
+  "14026999": "Colin Y",
   "15854682": "Daniel",
   "14027004": "Danny",
   "10415946": "Darian",
@@ -56,7 +56,7 @@ var athleteIDtoNames = {
   "15854676": "Schuyler",
   "14027003": "Shishir",
   "12255516": "Sid",
-  "15854670": "Siyi",
+  "15854670": "Jim",
   "15854683": "Spencer",
   "15854679": "Thomas",
   "12255495": "Trevor",
@@ -66,7 +66,7 @@ var athleteIDtoNames = {
 };
 
 
-var meetLink = "https://www.athletic.net/CrossCountry/meet/145525/results";
+var meetLink = "https://www.athletic.net/CrossCountry/meet/158287/results";
 var results = {};
 var length=0;
 var racesStarted=0;

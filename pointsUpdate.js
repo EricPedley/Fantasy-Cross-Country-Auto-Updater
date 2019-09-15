@@ -6,7 +6,7 @@
 // 2. Install the Node.js client library by running
 //    `npm install googleapis --save`
 
-const google = require('googleapis');
+const {google} = require('googleapis');
 const fs = require('fs');
 const readline = require('readline');
 
@@ -15,7 +15,7 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 
 var sheets = google.sheets('v4');
 
-const members = ["Sid", "Eric", "Drew", "Trevor", "Logan", "Rishab", "Andrew"];
+const members = ["Waivers","Sid", "Eric", "Drew", "Trevor", "Logan", "Rishab", "Andrew"];
 
 const sheetID = "11gJYQ9SRDQMBY-W6gNw9hSggOgse5Bbcx-m1SVU6l4I";
 
@@ -34,10 +34,18 @@ function readResultsAndUpdate(authClient) {
 
 function updatePoints(gridLetter, gridNumber, results, authClient) {//grid Letter and Number are the coordinates of the top slot for points
     members.forEach((member) => {
-        let playerRowLetter = String.fromCharCode(gridLetter.charCodeAt(0) - 1)
+        let numPlayers=5;
+        let letter=gridLetter;
+        let number=gridNumber;
+        if(member==="Waivers") {
+            numPlayers=7;
+            letter="B";
+            number=2;
+        }
+        let playerRowLetter = String.fromCharCode(letter.charCodeAt(0) - 1)
         var request = {
             spreadsheetId: sheetID,
-            range: member + "!" + playerRowLetter + gridNumber + ":" + playerRowLetter + (gridNumber + 4),
+            range: member + "!" + playerRowLetter + number + ":" + playerRowLetter + (number + (numPlayers-1)),
             majorDimension: "COLUMNS",
             auth: authClient
         }
@@ -49,13 +57,13 @@ function updatePoints(gridLetter, gridNumber, results, authClient) {//grid Lette
             if (response.data.values !== undefined)
                 Array.from(response.data.values)[0].forEach((player, index) => {
                     var points = 0;
-                    if (results[player] !== undefined)
-                        points = results[player];
+                    if (results[player.trim()] !== undefined)
+                        points = results[player.trim()];
                     var request = {//data to be sent to spreadsheet API
                         // The ID of the spreadsheet to update.
                         spreadsheetId: sheetID,
                         // The A1 notation of the values to update.
-                        range: member + '!' + gridLetter + (gridNumber + index),
+                        range: member + '!' + letter + (number + index),
                         // How the input data should be interpreted.
                         valueInputOption: 'RAW',
                         resource: {
