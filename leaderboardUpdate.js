@@ -45,33 +45,33 @@ function updateLeaderboard(gridLetter, gridNumber, results, authClient) {//grid 
                 return;
             }
             if (response.data.values !== undefined)
-                    var request = {//data to be sent to spreadsheet API
-                        // The ID of the spreadsheet to update.
-                        spreadsheetId: sheetID,
-                        // The A1 notation of the values to update.
-                        range: member + '!' + gridLetter + (gridNumber + index),
-                        // How the input data should be interpreted.
-                        valueInputOption: 'RAW',
-                        resource: {
-                            "values": [
-                                [
-                                    points
-                                ]
+                var request = {//data to be sent to spreadsheet API
+                    // The ID of the spreadsheet to update.
+                    spreadsheetId: sheetID,
+                    // The A1 notation of the values to update.
+                    range: 'Leaderboard!A1:B7',
+                    // How the input data should be interpreted.
+                    valueInputOption: 'RAW',
+                    resource: {
+                        "values": [
+                            [
+                                points
                             ]
-                        },
+                        ]
+                    },
 
-                        auth: authClient,
-                    };
-                    sheets.spreadsheets.values.update(request, function (err, response) {
-                        console.log("done");
-                        if (err) {
-                            console.error(err);
-                            return;
-                        }
-                    });
-                });
+                    auth: authClient,
+                };
+            sheets.spreadsheets.values.update(request, function (err, response) {
+                console.log("done");
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+            });
         });
     });
+});
 }
 
 
