@@ -12,10 +12,10 @@ var athleteIDtoNames = {
   "10415964": "Arjun",
   "12255496": "Ben",
   "15854678": "Brevin",
-  "12255512": "Charles",
+  "12255512": "Charlie",
   "14519743": "Colin S",
   "14026999": "Colin Y",
-  "15854682": "Daniel",
+  "15854682": "Daniel Y",
   "14027004": "Danny",
   "10415946": "Darian",
   "14026983": "Defne",
@@ -31,6 +31,7 @@ var athleteIDtoNames = {
   "10415958": "Jackson",
   "15854680": "Jasper",
   "15854674": "Jeffrey",
+  "10415961": "Jeffrey",
   "15854665": "Jessica",
   "15854681": "Jonathan",
   "15854673": "Julian",
@@ -66,42 +67,52 @@ var athleteIDtoNames = {
 };
 
 
-var meetLink = "https://www.athletic.net/CrossCountry/meet/158287/results";
+var meetLink = "https://www.athletic.net/CrossCountry/meet/156935/results";//mount sac 2019
 var results = {};
-var length=0;
-var racesStarted=0;
-var racesFinished=0;
+var length = 0;
+var racesStarted = 0;
+var racesFinished = 0;
 rp(meetLink)
   .then(function (html) {
     //success!
     //console.log(html.substring(html.indexOf('"IDMeetDiv":')+12,html.indexOf('"IDMeetDiv":')+19));
-    for (let i = 0; i!==-1; i = html.indexOf('"IDMeetDiv":', i + 1)) {
+    for (let i = 0; i !== -1; i = html.indexOf('"IDMeetDiv":', i + 1)) {
       let id = html.substring(i + 12, i + 18);
       if (Number(id)) {
         racesStarted++;
         let raceLink = meetLink + "/" + id;
         rp(raceLink)
           .then(function (html) {
-            let totalRunners = html.match(/"FirstName"/g).length;
-            for (let i = html.indexOf('"Place":'); i != -1; i = html.indexOf('"Place":', i + 1)) {
-              let athleteIDIndex = html.indexOf('"AthleteID":', i);
-              let place = html.substring(i + 8, html.indexOf('"AthleteName":', i) - 1);
-              let athleteID = html.substring(athleteIDIndex + 12, html.indexOf(',"FirstName":', i));
-              if (athleteIDIndex === -1)
-                break;
-              if (athleteIDtoNames[athleteID]) {
-                let score = Math.round(100 * (1 - (place - 1) / totalRunners));
-                let name = athleteIDtoNames[athleteID];
-                results[name] = score;
-                length++;
-              }
-              if(place==totalRunners) {
-                racesFinished++;
-                if(racesFinished===racesStarted){
-                  fs.writeFile("results.json",JSON.stringify(results),()=>{});
-                  console.log("done");
+            console.log("starting a race");
+            if (html.match(/"FirstName"/g)!==null) {
+              let totalRunners = html.match(/"FirstName"/g).length;
+              let runnersProcessed=0;
+              for (let i = html.indexOf('"Place":'); i != -1; i = html.indexOf('"Place":', i + 1)) {
+                let athleteIDIndex = html.indexOf('"AthleteID":', i);
+                let place = html.substring(i + 8, html.indexOf('"AthleteName":', i) - 1);
+                let athleteID = html.substring(athleteIDIndex + 12, html.indexOf(',"FirstName":', i));
+                if(place===96) {
+                  console.log(athleteID)
+                }
+                if (athleteIDIndex === -1)
+                  break;
+                if (athleteIDtoNames[athleteID]) {
+                  let score = Math.round(100 * (1 - (place - 1) / totalRunners));
+                  let name = athleteIDtoNames[athleteID];
+                  results[name] = score;
+                  length++;
+                }
+                runnersProcessed++;
+                if (runnersProcessed >= totalRunners) {
+                  racesFinished++;
+                  if (racesFinished === racesStarted) {
+                    fs.writeFile("results.json", JSON.stringify(results), () => { });
+                    console.log("done");
+                  }
                 }
               }
+            } else {
+              racesFinished++;
             }
           }).catch(function (err) {
             console.log(err);

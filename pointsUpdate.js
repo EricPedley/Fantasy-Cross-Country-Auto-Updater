@@ -28,7 +28,7 @@ fs.readFile('credentials.json', (err, content) => {
 function readResultsAndUpdate(authClient) {
     fs.readFile("results.json", (err, content) => {
         if (err) return console.log('Error loading results file:', err);
-        updatePoints("D", 2, JSON.parse(content), authClient);
+        updatePoints("J", 10, JSON.parse(content), authClient);
     });
 }
 
